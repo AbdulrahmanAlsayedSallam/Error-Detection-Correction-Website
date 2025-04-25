@@ -42,8 +42,8 @@ This tool is built using **HTML**, **CSS**, and **JavaScript** with a clean and 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/error-detection-tool.git
-cd error-detection-tool
+git clone https://github.com/AbdulrahmanAlsayedSallam/Error-Detection-Correction-Website.git
+cd Error-Detection-Correction-Website
 ```
 
 ### 2. Open in your browser
