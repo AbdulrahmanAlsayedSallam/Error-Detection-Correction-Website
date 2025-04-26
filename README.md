@@ -3,8 +3,10 @@
 A simple, interactive web-based tool to demonstrate three error detection and correction techniques in digital communication:
 
 - ✅ **Parity Check**
-- 🛰️ **Hamming Code (7-bit)**
+- 🛰️ **Hamming Code**
 - 🧮 **CRC (Cyclic Redundancy Check)**
+- ➕ **Checksum**
+- 🛠️ **Two-Dimensional Parity**
 
 This tool is built using **HTML**, **CSS**, and **JavaScript** with a clean and modern UI.
 
@@ -23,6 +25,14 @@ This tool is built using **HTML**, **CSS**, and **JavaScript** with a clean and 
 ### 🧮 CRC (Cyclic Redundancy Check)
 - **Generate:** Enter data and a generator polynomial to view step-by-step CRC computation and the transmitted codeword.
 - **Check:** Validate a received codeword and detect any errors based on the generator polynomial.
+
+### ➕ Checksum
+- **Generate:** Enter data and compute the checksum value.
+- **Check:** Validate a received data packet by comparing the checksum value.
+
+### 🛠️ Two-Dimensional Parity
+- Applies **row** and **column** parity checks to detect errors in 2D data arrays.
+- Detects errors in both horizontal and vertical directions.
 
 ---
 
