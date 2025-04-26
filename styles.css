@@ -20,15 +20,20 @@ nav {
 nav button {
   margin: 0.2rem;
   padding: 0.5rem 1rem;
-  background: #3b82f6;
+  background: #2563eb;
   border: none;
   color: white;
   cursor: pointer;
   border-radius: 6px;
+  transition: background 0.3s ease;
 }
 
 nav button:hover {
-  background: #2563eb;
+  background: #1e40af;
+}
+
+nav button:active {
+  background: #1e3a8a;
 }
 
 main {
@@ -42,112 +47,183 @@ section {
   border-radius: 10px;
   margin-bottom: 20px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 section.visible {
   display: block;
 }
 
-#hammingResult span {
-  display: inline-block;
-  width: 1.2em;
-  text-align: center;
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.6rem 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: block;
 }
 
-input[type="text"],
-select {
-width: 100%;
-max-width: 400px;
-padding: 0.6rem 1rem;
-margin: 0.5rem 0;
-border: 1px solid #d1d5db;
-border-radius: 8px;
-background-color: #f9fafb;
-font-size: 1rem;
-font-family: inherit;
-transition: border 0.2s ease, box-shadow 0.2s ease;
-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-display: block;
+textarea {
+  min-height: 150px;
 }
 
 input[type="text"]:focus,
-select:focus {
-outline: none;
-border-color: #3b82f6;
-box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
 label {
-display: block;
-margin-top: 1rem;
-font-weight: 600;
-color: #374151;
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #374151;
 }
 
-section {
-display: none;
-background: white;
-padding: 20px;
-border-radius: 10px;
-margin-bottom: 20px;
-box-shadow: 0 0 10px rgba(0,0,0,0.1);
-max-width: 600px;
-margin-left: auto;
-margin-right: auto;
-}
-
-section.visible {
-display: block;
-}
-
-/* General Button Styling */
 button {
-background: linear-gradient(to right, #3b82f6, #2563eb);
-color: white;
-border: none;
-border-radius: 8px;
-padding: 0.6rem 1.2rem;
-font-size: 1rem;
-font-weight: 600;
-cursor: pointer;
-transition: background 0.3s ease, transform 0.2s ease;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-background: linear-gradient(to right, #2563eb, #1e40af);
-transform: translateY(-1px);
-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(to right, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 button:active {
-transform: translateY(0);
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Optional: Add spacing below each button for layout balance */
 button + button {
-margin-top: 0.5rem;
+  margin-top: 0.5rem;
 }
 
-/* Navigation Button Styling */
-nav button {
-margin: 0.2rem;
-padding: 0.5rem 1rem;
-background: #2563eb; /* Slightly darker blue */
-border: none;
-color: white;
-cursor: pointer;
-border-radius: 6px;
-transition: background 0.3s ease;
+/* Result Containers */
+#crcResult,
+#checksumResult,
+#hammingResult,
+#parityResult,
+#twodResult {
+  font-family: monospace;
+  white-space: pre-wrap;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-top: 1rem;
 }
 
-nav button:hover {
-background: #1e40af; /* Darker shade of blue on hover */
+/* Status Messages */
+.error,
+.error-message,
+.crc-error {
+  color: #dc2626;
+  font-weight: bold;
 }
 
-nav button:active {
-background: #1e3a8a; /* Even darker blue when pressed */
+.success,
+.success-message,
+.crc-success {
+  color: #16a34a;
+  font-weight: bold;
 }
 
+.correct {
+  color: #2563eb;
+  font-weight: bold;
+}
 
+/* Checksum Specific */
+.checksum-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.button-group button {
+  flex: 1;
+}
+
+.result-container {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.highlight {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+/* 2D Parity Grid */
+.grid {
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  color: black;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.cell.parity {
+  background-color: #d1e7dd;
+}
+
+.cell.row-error,
+.cell.col-error {
+  background-color: #f8d7da;
+}
+
+.cell.corrected {
+  background-color: #cfe2ff;
+}
