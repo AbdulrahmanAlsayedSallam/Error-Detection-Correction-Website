@@ -12,7 +12,9 @@
       <button onclick="showSection('parity')">Parity Check</button>
       <button onclick="showSection('hamming')">Hamming Code</button>
       <button onclick="showSection('crc')">CRC</button>
-    </nav>
+      <button onclick="showSection('checksum')">Checksum</button>
+      <button onclick="showSection('twodparity')">2D Parity</button>
+    </nav>    
   </header>
 
   <main>
@@ -30,43 +32,62 @@
 
     <section id="hamming">
       <h2>Hamming Code</h2>
-
-      <!-- Dropdown for Hamming Code options -->
       <label for="hammingOption">Choose an option:</label>
       <select id="hammingOption">
         <option value="encode">Generate Hamming Code</option>
         <option value="decode">Check for Errors & Correct</option>
       </select>
-
-      <!-- Input for binary data -->
-      <input type="text" id="hammingInput" placeholder="Enter 4-bit binary data">
-
-      <!-- Buttons for both options -->
+      <input type="text" id="hammingInput" placeholder="Enter 4+ bit binary data (e.g., 1011)">
       <button onclick="hammingAction()">Submit</button>
       <p id="hammingResult"></p>
     </section>
 
-    <!-- CRC Section -->
     <section id="crc">
       <h2>CRC (Cyclic Redundancy Check)</h2>
-
       <label for="crcMode">Select CRC Mode:</label>
-        <select id="crcMode" onchange="updateCRCPlaceholder()">
-          <option value="generate">Generate CRC Codeword</option>
-          <option value="check">Check for Errors</option>
-        </select>
-  <br><br>
+      <select id="crcMode" onchange="updateCRCPlaceholder()">
+        <option value="generate">Generate CRC Codeword</option>
+        <option value="check">Check for Errors</option>
+      </select>
+      <br><br>
+      <input type="text" id="crcData" placeholder="Enter data (e.g., 10011000)">
+      <br><br>
+      <input type="text" id="crcDivisor" placeholder="Enter divisor (e.g., 1101)">
+      <br><br>
+      <button onclick="handleCRC()">Compute CRC</button>
+      <pre id="crcResult"></pre>
+    </section>
 
-  <input type="text" id="crcData" placeholder="Enter data (e.g., 10011000)">
-  <br><br>
-  <input type="text" id="crcDivisor" placeholder="Enter divisor (e.g., 1101)">
-  <br><br>
-  <button onclick="handleCRC()">Compute CRC</button>
-  <pre id="crcResult"></pre>
-</section>
+    <section id="checksum">
+      <h2>Checksum</h2>
+      <div class="checksum-container">
+        <div class="input-group">
+          <label for="checksumInput">Enter hexadecimal bytes (space-separated):</label>
+          <input type="text" id="checksumInput" placeholder="Example: A3 7F 1C D4">
+          <div class="button-group">
+            <button onclick="generateChecksum()">Generate Checksum</button>
+            <button onclick="verifyChecksum()">Verify Checksum</button>
+          </div>
+        </div>
+        <div class="result-container">
+          <h3>Results:</h3>
+          <div id="checksumResult" class="checksum-result"></div>
+        </div>
+      </div>
+    </section>
 
+    <section id="twodparity">
+      <h2>Two-Dimensional Parity</h2>
+      <textarea id="twodInput" placeholder="Enter binary numbers, one per line
+Example:
+1101
+1011
+1001"></textarea>
+      <button onclick="generate2DParity()">Generate 2D Parity</button>
+      <button onclick="verify2DParity()">Verify 2D Parity</button>
+      <pre id="twodResult"></pre>
+    </section>
   </main>
-
   <script src="script.js" defer></script>
 </body>
 </html>
