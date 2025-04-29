@@ -7,29 +7,81 @@ function showSection(id) {
 }
 
 // ======================= Parity Check =======================
-function checkParity() {
+function generateParity(input, parityType) {
+  if (!/^[01]+$/.test(input)) {
+    throw new Error('Invalid input. Please enter binary data only.');
+  }
+
+  const bitCount = [...input].reduce((sum, bit) => sum + parseInt(bit), 0);
+  const needsParityBit = (parityType === 'even') 
+    ? (bitCount % 2 !== 0)
+    : (bitCount % 2 === 0);
+  
+  const parityBit = needsParityBit ? '1' : '0';
+  return {
+    output: input + parityBit,
+    explanation: `Original: ${input}\n`
+      + `Number of 1s: ${bitCount} (${bitCount % 2 === 0 ? 'Even' : 'Odd'})\n`
+      + `Added parity bit (${parityType}): ${parityBit}\n`
+      + `Final output: ${input + parityBit}`
+  };
+}
+
+function checkParity(input, parityType) {
+  if (!/^[01]+$/.test(input)) {
+    throw new Error('Invalid input. Please enter binary data only.');
+  }
+
+  if (input.length < 1) {
+    throw new Error('Input must contain at least 1 bit');
+  }
+
+  const data = input.slice(0, -1);
+  const receivedParity = input.slice(-1);
+  const bitCount = [...data].reduce((sum, bit) => sum + parseInt(bit), 0);
+
+  const expectedParity = (parityType === 'even')
+    ? (bitCount % 2 === 0 ? '0' : '1')
+    : (bitCount % 2 === 0 ? '1' : '0');
+
+  const isValid = (receivedParity === expectedParity);
+  const result = isValid 
+    ? '✅ Parity check passed (No errors detected)'
+    : '❌ Parity check failed (Error detected)';
+
+  return {
+    output: result,
+    explanation: `Data: ${data}\n`
+      + `Received parity bit: ${receivedParity}\n`
+      + `Number of 1s in data: ${bitCount}\n`
+      + `Expected parity bit (${parityType}): ${expectedParity}`
+  };
+}
+
+
+function parityAction() {
+  const option = document.getElementById('parityOption').value;
   const input = document.getElementById('parityInput').value;
   const parityType = document.getElementById('parityType').value;
+  const resultEl = document.getElementById('parityResult');
 
-  // Validate input (binary digits only)
-  if (!/^[01]+$/.test(input)) {
-    document.getElementById('parityResult').textContent = 'Invalid input. Please enter binary data only.';
-    return;
+  try {
+    if (option === 'generate') {
+      const { output, explanation } = generateParity(input, parityType);
+      resultEl.innerHTML = `
+        <div class="explanation">${explanation.replace(/\n/g, '<br>')}</div>
+        <div class="result">Output with parity bit: <strong>${output}</strong></div>
+      `;
+    } else {
+      const { output, explanation } = checkParity(input, parityType);
+      resultEl.innerHTML = `
+        <div class="explanation">${explanation.replace(/\n/g, '<br>')}</div>
+        <div class="result">${output}</div>
+      `;
+    }
+  } catch (e) {
+    resultEl.textContent = `Error: ${e.message}`;
   }
-
-  const bitCount = [...input].reduce((sum, bit) => sum + parseInt(bit), 0);  // Sum of 1s in input
-
-  // Check parity
-  const isEven = bitCount % 2 === 0;
-  let result = '';
-
-  if (parityType === 'even') {
-    result = isEven ? 'Even parity (No Errors Detected)' : 'Odd parity (Error Detected)';
-  } else {
-    result = isEven ? 'Even parity (Error Detected)' : 'Odd parity (No Errors Detected)';
-  }
-
-  document.getElementById('parityResult').textContent = `Sum of 1s: ${bitCount} → ${result}`;
 }
 
 // ======================= Hamming Code =======================
@@ -91,43 +143,71 @@ function hammingDecode(input) {
   const n = code.length;
   const parityCount = Math.floor(Math.log2(n)) + 1;
   let errorPos = 0;
-  
+
+  // Calculate the error position using the syndrome
   for (let p = 0; p < parityCount; p++) {
     let syndromeBit = 0;
-    
     for (let i = 0; i < n; i++) {
       if ((i + 1) & (1 << p)) {
         syndromeBit ^= code[i];
       }
     }
-    
     if (syndromeBit) {
       errorPos += Math.pow(2, p);
     }
   }
-  
-  if (errorPos > 0 && errorPos <= n) {
-    code[errorPos - 1] ^= 1;
-  }
-  
+
   const dataPositions = [];
   for (let i = 0; i < n; i++) {
     if (!isPowerOfTwo(i + 1)) {
       dataPositions.push(i);
     }
   }
-  
+
   const originalData = [];
   for (let i = dataPositions.length - 1; i >= 0; i--) {
     originalData.push(code[dataPositions[i]]);
   }
-  
+
+  // Syndrome is zero → no error
   if (errorPos === 0) {
     return `Decoded output: ${originalData.join('')} (No errors detected)`;
+  }
+
+  // Syndrome points to invalid position → uncorrectable
+  if (errorPos > n) {
+    return `Decoded output: ${originalData.join('')} (❌ Error detected but uncorrectable — syndrome points outside codeword)`;
+  }
+
+  // Simulate correcting the error and check the syndrome again
+  code[errorPos - 1] ^= 1;  // Correct the error at the position
+
+  // Recalculate the syndrome after the correction to see if it's valid
+  let checkSyndrome = 0;
+  for (let p = 0; p < parityCount; p++) {
+    let bit = 0;
+    for (let i = 0; i < n; i++) {
+      if ((i + 1) & (1 << p)) {
+        bit ^= code[i];
+      }
+    }
+    if (bit) checkSyndrome += Math.pow(2, p);
+  }
+
+  // If no error is detected after correction, it's a single-bit error
+  if (checkSyndrome === 0) {
+    for (let i = dataPositions.length - 1; i >= 0; i--) {
+      originalData[i] = code[dataPositions[i]];
+    }
+    return `Decoded output: ${originalData.join('')} (✅ Error detected at position ${errorPos} and corrected)`;
   } else {
-    return `Decoded output: ${originalData.join('')} (Error detected at position ${errorPos} and corrected)`;
+    // If the syndrome is still non-zero, it's a multiple-bit error
+    return `Decoded output: ${originalData.join('')} (❌ Multiple-bit error detected — cannot correct)`;
   }
 }
+
+
+
 
 function hammingAction() {
   const option = document.getElementById('hammingOption').value;
@@ -175,25 +255,38 @@ function xorStrings(a, b) {
   
   // Core CRC generation logic
   function computeCRC(data, divisor) {
-  const paddedData = data + '0'.repeat(divisor.length - 1);
-  let workingBits = paddedData.slice(0, divisor.length);
-  let log = '----------\n' + paddedData + '\n' + divisor + '\n';
-  
-  for (let i = divisor.length; i <= paddedData.length; i++) {
-    log += '----\n';
-    const currentDiv = workingBits[0] === '1' ? divisor : '0'.repeat(divisor.length);
-    const xor = xorStrings(workingBits, currentDiv);
-    workingBits = xor.slice(1) + (paddedData[i] || '');
-    log += ' '.repeat(i - divisor.length + 1) + workingBits + '\n';
-    log += ' '.repeat(i - divisor.length + 1) + currentDiv + '\n';
-  }
-  
-  const remainder = workingBits;
-  const codeword = data + remainder;
-  log += '----\n';
-  log += ' '.repeat(data.length) + remainder + '\n\n';
-  log += `Transmitted value is:\t${codeword}`;
-  return { log, codeword, remainder };
+    const paddedData = data + '0'.repeat(divisor.length - 1);
+    let workingBits = paddedData.slice(0, divisor.length);
+    let log = '----------\n' + paddedData + '\n' + divisor + '\n';
+    
+    for (let i = divisor.length; i <= paddedData.length; i++) {
+      const currentDiv = workingBits[0] === '1' ? divisor : '0'.repeat(divisor.length);
+      const xor = xorStrings(workingBits, currentDiv);
+      workingBits = xor.slice(1) + (paddedData[i] || '');
+      
+      // Calculate the correct spacing for the divider
+      const spacer = ' '.repeat(i - divisor.length);
+      
+      // Add arrow showing next bit coming down (only when there are more bits)
+      if (i < paddedData.length) {
+        const arrowPos = i;
+        const arrowSpacer = ' '.repeat(arrowPos);
+        log += `${arrowSpacer}↓ (Next bit: ${paddedData[i]})\n`;
+      }
+      
+      // Add divider with correct spacing
+      log += `${spacer}${'-'.repeat(4)}\n`;
+      
+      // Add the working bits and divisor with correct spacing
+      log += `${spacer}${workingBits}\n`;
+      log += `${spacer}${currentDiv}\n`;
+    }
+    
+    const remainder = workingBits;
+    const codeword = data + remainder;
+    log += ' '.repeat(data.length) + remainder + '\n\n';
+    log += `Transmitted value is:\t${codeword}`;
+    return { log, codeword, remainder };
   }
   
   // Error-checking logic for received codeword
@@ -205,16 +298,29 @@ function xorStrings(a, b) {
     log += divisor + '\n';
     
     for (let i = divisor.length; i <= received.length; i++) {
-      log += '----\n';
       const currentDiv = workingBits[0] === '1' ? divisor : '0'.repeat(divisor.length);
       const xor = xorStrings(workingBits, currentDiv);
       workingBits = xor.slice(1) + (received[i] || '');
-      log += ' '.repeat(i - divisor.length + 1) + workingBits + '\n';
-      log += ' '.repeat(i - divisor.length + 1) + currentDiv + '\n';
+      
+      // Calculate the correct spacing for the divider
+      const spacer = ' '.repeat(i - divisor.length);
+      
+      // Add arrow showing next bit coming down (only when there are more bits)
+      if (i < received.length) {
+        const arrowPos = i;
+        const arrowSpacer = ' '.repeat(arrowPos);
+        log += `${arrowSpacer}↓ (Next bit: ${received[i]})\n`;
+      }
+      
+      // Add divider with correct spacing
+      log += `${spacer}${'-'.repeat(4)}\n`;
+      
+      // Add the working bits and divisor with correct spacing
+      log += `${spacer}${workingBits}\n`;
+      log += `${spacer}${currentDiv}\n`;
     }
     
     const remainder = workingBits;
-    log += '----\n';
     log += ' '.repeat(received.length - divisor.length + 1) + remainder + '\n\n';
     
     const hasError = /1/.test(remainder);
@@ -282,33 +388,39 @@ function generateChecksum() {
   const resultEl = document.getElementById('checksumResult');
 
   try {
-    // Validate input
+    // Validate input (1-2 hex digits per byte)
     if (!hexBytes.every(byte => /^[0-9A-F]{1,2}$/.test(byte))) {
       throw new Error('Each byte must be 1-2 hex digits (0-9, A-F)');
     }
 
-    // Calculate sum
+    // Calculate 1's complement sum of all bytes
     let sum = 0;
     let calculationSteps = "Calculation Steps:\n";
     calculationSteps += "--------------------\n";
     
     for (const hexByte of hexBytes) {
       const decimalValue = parseInt(hexByte, 16);
-      const binaryValue = hexToBinary(hexByte);
+      const binaryValue = decimalValue.toString(2).padStart(8, '0');
       calculationSteps += `${hexByte} → ${binaryValue} (${decimalValue})\n`;
       sum += decimalValue;
+      
+      // Handle carry (wrap around for 8-bit 1's complement)
+      while (sum > 0xFF) {
+        sum = (sum & 0xFF) + (sum >> 8);
+      }
     }
 
-    calculationSteps += "--------------------\n";
-    calculationSteps += `Total sum: ${sum} (0x${sum.toString(16).toUpperCase()})\n`;
-
-    const checksum = (256 - (sum % 256)) % 256;
+    // Final 1's complement checksum
+    const checksum = (~sum) & 0xFF;
     const checksumHex = checksum.toString(16).padStart(2, '0').toUpperCase();
-    const checksumBinary = checksum.toString(2).padStart(8, '0');
+    
+    calculationSteps += "--------------------\n";
+    calculationSteps += `Sum: 0x${sum.toString(16).toUpperCase().padStart(2, '0')}\n`;
+    calculationSteps += `1's complement checksum: 0x${checksumHex}\n`;
     
     resultEl.innerHTML = `
       ${calculationSteps.replace(/\n/g, '<br>')}
-      <div class="highlight">Checksum: 0x${checksumHex} (${checksumBinary})</div>
+      <div class="highlight">Checksum: 0x${checksumHex}</div>
       <div class="highlight">Final Codeword: ${hexBytes.join(' ')} ${checksumHex}</div>
     `;
   } catch (e) {
@@ -327,45 +439,38 @@ function verifyChecksum() {
       throw new Error('Enter at least 2 hex bytes including the checksum');
     }
 
-    // Separate data and checksum
-    const dataBytes = hexBytes.slice(0, -1);
-    const givenChecksumHex = hexBytes[hexBytes.length - 1];
-    
-    // Calculate sum of data bytes
+    // Calculate 1's complement sum of all bytes (including checksum)
     let sum = 0;
     let calculationSteps = "Verification Steps:\n";
     calculationSteps += "--------------------\n";
     
-    for (const hexByte of dataBytes) {
+    for (const hexByte of hexBytes) {
       const decimalValue = parseInt(hexByte, 16);
-      const binaryValue = hexToBinary(hexByte);
+      const binaryValue = decimalValue.toString(2).padStart(8, '0');
       calculationSteps += `${hexByte} → ${binaryValue} (${decimalValue})\n`;
       sum += decimalValue;
+      
+      // Handle carry (wrap around for 8-bit 1's complement)
+      while (sum > 0xFF) {
+        sum = (sum & 0xFF) + (sum >> 8);
+      }
     }
 
-    // Add the checksum
-    const checksumValue = parseInt(givenChecksumHex, 16);
-    sum += checksumValue;
-    
     calculationSteps += "--------------------\n";
-    calculationSteps += `Checksum: ${givenChecksumHex} (${checksumValue})\n`;
-    calculationSteps += `Total sum: ${sum} (0x${sum.toString(16).toUpperCase()})\n`;
-
-    const remainder = sum % 256;
+    calculationSteps += `Total sum: 0x${sum.toString(16).toUpperCase().padStart(2, '0')}\n`;
     
-    if (remainder === 0) {
+    // In 1's complement, valid checksum should sum to 0xFF (all 1's in 8 bits)
+    const isValid = (sum === 0xFF);
+    
+    if (isValid) {
       resultEl.innerHTML = `
         ${calculationSteps.replace(/\n/g, '<br>')}
-        <div class="success">✅ Checksum is valid! (Sum is divisible by 256)</div>
+        <div class="success">✅ Checksum is valid! (Sum is 0xFF)</div>
       `;
     } else {
-      const correctChecksum = (256 - (sum - checksumValue) % 256) % 256;
-      const correctChecksumHex = correctChecksum.toString(16).padStart(2, '0').toUpperCase();
-      
       resultEl.innerHTML = `
         ${calculationSteps.replace(/\n/g, '<br>')}
-        <div class="error">❌ Error detected! Remainder: ${remainder}</div>
-        <div class="highlight">Expected checksum: 0x${correctChecksumHex}</div>
+        <div class="error">❌ Error detected! Sum should be 0xFF, got 0x${sum.toString(16).toUpperCase().padStart(2, '0')}</div>
       `;
     }
   } catch (e) {
