@@ -168,16 +168,6 @@ button + button {
   gap: 0.8rem;
 }
 
-.button-group {
-  display: flex;
-  gap: 0.8rem;
-  margin-top: 0.5rem;
-}
-
-.button-group button {
-  flex: 1;
-}
-
 .result-container {
   background: #f8fafc;
   border-radius: 8px;
@@ -226,4 +216,30 @@ button + button {
 
 .cell.corrected {
   background-color: #cfe2ff;
+}
+
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Equal width columns */
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.button-group button {
+  flex: 1;
+  min-width: 120px; /* Set a minimum width that fits both buttons */
+}
+
+#crc select {
+  margin-bottom: 0.5rem; /* Reduce space after dropdown */
+}
+
+#crc input {
+  margin: 0.5rem 0; /* Consistent spacing */
+}
+
+.crc-generate {
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1.4;
 }
