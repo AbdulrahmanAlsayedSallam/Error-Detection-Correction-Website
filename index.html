@@ -20,13 +20,18 @@
   <main>
     <section id="parity" class="visible">
       <h2>Parity Check</h2>
+      <label for="parityOption">Choose an option:</label>
+      <select id="parityOption">
+        <option value="generate">Generate Parity Bit</option>
+        <option value="check">Check Parity</option>
+      </select>
       <input type="text" id="parityInput" placeholder="Enter binary data">
       <label for="parityType">Parity Type:</label>
       <select id="parityType">
         <option value="even">Even</option>
         <option value="odd">Odd</option>
       </select>
-      <button onclick="checkParity()">Check Parity</button>
+      <button onclick="parityAction()">Submit</button>
       <p id="parityResult"></p>
     </section>
 
