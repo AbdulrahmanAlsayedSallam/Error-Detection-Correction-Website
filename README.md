@@ -19,7 +19,7 @@ This tool is built using **HTML**, **CSS**, and **JavaScript** with a clean and 
 - Detects single-bit errors based on the sum of 1s in the data.
 
 ### 🛰️ Hamming Code
-- **Encode:** Enter 4-bit binary input to generate a 7-bit Hamming codeword.
+- **Encode:** Enter 4 or more bit binary input to generate a Hamming codeword.
 - **Decode:** Input a 7-bit Hamming codeword to detect and correct single-bit errors.
 
 ### 🧮 CRC (Cyclic Redundancy Check)
