@@ -80,11 +80,3 @@ This tool is ideal for:
 - Projects in computer networks or digital communication
 
 ---
-
-## 📄 License
-
-MIT License
-
-You are free to use, modify, and distribute this project for educational or personal purposes.
-
----
